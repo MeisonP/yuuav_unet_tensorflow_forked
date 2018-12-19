@@ -236,7 +236,8 @@ def find_image_files(data_dir):
 
     assert len(color_files) == len(label_files)
 
-    matching_files = [ x.replace(FLAGS.name_color, '%s') for x in color_files ]
+    matching_files = [x.replace(FLAGS.name_color, '%s') for x in color_files]
+    # where the 08%s.png <--> 08_color.png comes from, !!!!
 
     filenames.extend(matching_files)
 

@@ -29,7 +29,8 @@ def load_datafiles(type):
     Get all tfrecords from tfrecords dir:
     """
 
-    tf_record_pattern = os.path.join(FLAGS.tfrecords_dir, '%s-*' % type)
+    # tf_record_pattern = os.path.join(FLAGS.tfrecords_dir, '%s-*' % type)
+    tf_record_pattern = FLAGS.tfrecords_dir
     data_files = tf.gfile.Glob(tf_record_pattern)
 
     data_size = 0
@@ -56,6 +57,10 @@ def maybe_save_images(images, filenames):
             file_path = os.path.join(FLAGS.output_dir, filenames[i])
             image = Image.fromarray(np.uint8(image_array))
             image.save(file_path)
+
+
+
+
     
     
 def evaluate():
@@ -73,6 +78,8 @@ def evaluate():
                                     batch_size = FLAGS.batch_size,
                                     num_epochs = 1,
                                     train = False)
+    labels = tf.stack([labels, labels], 3)
+    labels = tf.reshape(labels, (FLAGS.batch_size, FLAGS.image_size, FLAGS.image_size, 2))
 
     logits = unet.build(images, FLAGS.num_classes, False)
 
@@ -89,6 +96,7 @@ def evaluate():
 
     saver = tf.train.Saver()
 
+    # if not tf.gfile.Exists(FLAGS.checkpoint_path + '.meta'):
     if not tf.gfile.Exists(FLAGS.checkpoint_path + '.meta'):
         raise ValueError("Can't find checkpoint file")
     else:

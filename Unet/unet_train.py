@@ -82,6 +82,8 @@ def train():
 
     writer = tf.summary.FileWriter(FLAGS.checkpoint_dir + "/train_logs", sess.graph)
 
+    print('saving graph done')
+
     merged = tf.summary.merge_all()
 
     coord = tf.train.Coordinator()
@@ -93,8 +95,15 @@ def train():
     try:
         while not coord.should_stop():
             step = tf.train.global_step(sess, global_step)
+
+            run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
+            run_metadata = tf.RunMetadata()
             
-            _, loss_value, summary = sess.run([train_op, loss, merged])
+            _, loss_value, summary = sess.run([train_op, loss, merged],
+                                              options=run_options, run_metadata=run_metadata)
+
+            writer.add_run_metadata(run_metadata=run_metadata, tag=("tag%d" % step), global_step=step)
+
             writer.add_summary(summary, step)
 
             if step % 1000 == 0:
@@ -107,8 +116,8 @@ def train():
                 print('[PROGRESS]\tEpoch %d, Step %d: loss = %.2f, accuarcy = %.2f (%.3f sec)' % (epoch, step, loss_value, acc_seg_value, duration))
 
             if step % 5000 == 0:
-                print('[PROGRESS]\tSaving checkpoint')
                 checkpoint_path = os.path.join(FLAGS.checkpoint_dir, 'unet.ckpt')
+                print('[PROGRESS]\tSaving checkpoint done')
                 saver.save(sess, checkpoint_path, global_step = step)
 
     except tf.errors.OutOfRangeError:
@@ -144,7 +153,7 @@ if __name__ == '__main__':
     parser.add_argument('--checkpoint_dir', help = 'Checkpoints directory')
     parser.add_argument('--num_classes', help = 'Number of segmentation labels', type = int, default = 2)
     parser.add_argument('--class_weights', help = 'Weight per class for weighted loss. .npy file that contains single array [num_classes]')
-    parser.add_argument('--image_size', help = 'Target image size (resize)', type = int, default = 224)
+    parser.add_argument('--image_size', help = 'Target image size (resize)', type = int, default = 256)
     parser.add_argument('--learning_rate', help = 'Learning rate', type = float, default = 1e-4)
     parser.add_argument('--learning_rate_decay_steps', help = 'Learning rate decay steps', type = int, default = 10000)
     parser.add_argument('--learning_rate_decay_rate', help = 'Learning rate decay rate', type = float, default = 0.9)

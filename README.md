@@ -40,13 +40,15 @@ name_color, name_label specifies the sffuix of the image presenting the RGB and 
   and restore the pretrained model from checkpoint.
 
     ```
-    python unet_eval.py --tfrecords_dir ../Datasets/tfrecords
+    python unet_eval.py --tfrecords_dir ../Datasets/tfrecords --checkpoint_path ./checkpoints/
     ```
 
     To save the predicted annotations as png files, pass in an output directory to the eval script
 
     ```
-    python unet_eval.py  --tfrecords_dir ../Datasets/tfrecords --output_dir predictions
+    python unet_eval.py  --tfrecords_dir ../Datasets/tfrecords --output_dir predictions --checkpoint_path ./checkpoints/
+
+    The checkpoint_path is the path to the meta file for restore, eg:unet.ckpt-20000.meta
     ```
 
 ### Citing Unet

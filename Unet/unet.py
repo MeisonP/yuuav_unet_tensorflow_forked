@@ -124,11 +124,12 @@ def l2_loss():
     Returns:
         l2_loss: L2 loss for all weights
     """
-    
-    weights = [var for var in tf.trainable_variables() if var.name.endswith('weights:0')]
-    l2_loss = tf.add_n([tf.nn.l2_loss(w) for w in weights])
+    with tf.name_scope('l2_loss'):
 
-    tf.summary.scalar("loss/weights", l2_loss)
+        weights = [var for var in tf.trainable_variables() if var.name.endswith('weights:0')]
+        l2_loss = tf.add_n([tf.nn.l2_loss(w) for w in weights])
+
+        tf.summary.scalar("loss/weights", l2_loss)
 
     return l2_loss
 
